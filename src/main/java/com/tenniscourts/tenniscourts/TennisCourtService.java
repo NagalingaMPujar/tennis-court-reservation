@@ -5,6 +5,8 @@ import com.tenniscourts.schedules.ScheduleService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.ws.rs.BadRequestException;
+
 @Service
 @AllArgsConstructor
 public class TennisCourtService {
@@ -20,7 +22,7 @@ public class TennisCourtService {
     }
 
     public TennisCourtDTO findTennisCourtById(Long id) {
-        return tennisCourtRepository.findById(id).map(tennisCourtMapper::map).orElseThrow(() -> {
+        return tennisCourtRepository.findById(id).map(tennisCourtMapper::map).<BadRequestException>orElseThrow(() -> {
             throw new EntityNotFoundException("Tennis Court not found.");
         });
     }

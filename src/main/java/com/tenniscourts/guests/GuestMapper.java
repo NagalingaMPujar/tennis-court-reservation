@@ -5,7 +5,9 @@ import com.tenniscourts.reservations.Reservation;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.springframework.stereotype.Component;
 
+@Component
 @Mapper(componentModel = "spring")
 public interface GuestMapper {
 
@@ -14,8 +16,8 @@ public interface GuestMapper {
     @InheritInverseConfiguration
     GuestDTO map(Guest source);
 
-    @Mapping(target = "guest.id", source = "id")
-    @Mapping(target = "guest.name", source = "name")
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "name", source = "name")
     Guest map(CreateGuestRequestDTO source);
 
 }

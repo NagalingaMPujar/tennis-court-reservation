@@ -2,9 +2,12 @@ package com.tenniscourts.guests;
 
 import com.tenniscourts.exceptions.EntityNotFoundException;
 import lombok.AllArgsConstructor;
-import org.jvnet.hk2.annotations.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 
 
+import javax.ws.rs.BadRequestException;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,12 +15,14 @@ import java.util.Optional;
 @AllArgsConstructor
 public class GuestService {
 
+    @Autowired
     private final GuestRepository guestRepository;
 
+    @Autowired
     private final GuestMapper guestMapper;
 
     public GuestDTO findById(Long id) {
-        return guestRepository.findById(id).map(guestMapper::map).orElseThrow(() -> {
+        return guestRepository.findById(id).map(guestMapper::map).<BadRequestException>orElseThrow(() -> {
             throw new EntityNotFoundException("Guest not found.");
         });
     }
@@ -39,22 +44,22 @@ public class GuestService {
 
     }
 
-    public Guest updateGuest(CreateGuestRequestDTO createGuestRequestDTO) {
-        Optional<Guest> guestList = guestRepository.findById(createGuestRequestDTO.getId());
+    public Guest updateGuest(Long id, CreateGuestRequestDTO createGuestRequestDTO) {
+        Optional<Guest> guestList = guestRepository.findById(id);
         Guest guest = new Guest();
         if (guestList.isPresent()) {
             guest = guestList.get();
             guest.setName(createGuestRequestDTO.getName());
+            guestRepository.save(guest);
+        } else {
+            throw new EntityNotFoundException(" No guest found to update");
         }
 
-        return guestRepository.save(guest);
+        return guest;
     }
 
     public void deleteGuest(Long id) {
-        Optional<Guest> guestList = guestRepository.findById(id);
-        if (guestList.isPresent()) {
-            guestRepository.delete(guestList.get());
-        }
+        guestRepository.deleteById(id);
     }
 
 
