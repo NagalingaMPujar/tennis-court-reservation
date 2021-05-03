@@ -27,7 +27,7 @@ public class GuestService {
         });
     }
 
-    public Guest findByName(String name) {
+    public List<Guest> findByName(String name) {
         return guestRepository.findByName(name);
     }
 
