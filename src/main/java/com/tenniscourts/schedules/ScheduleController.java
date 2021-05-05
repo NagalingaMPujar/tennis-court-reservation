@@ -4,6 +4,7 @@ import com.tenniscourts.config.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,8 +31,9 @@ public class ScheduleController extends BaseRestController {
     //TODO: implement rest and swagger
     @GetMapping(value = "/get-by-dates")
     @ApiOperation(value = "find schedule by dates", response = ResponseEntity.class)
-    public ResponseEntity<List<Schedule>> findSchedulesByDates(@RequestParam LocalDate startDate,
-                                                                  @RequestParam LocalDate endDate) {
+    public ResponseEntity<List<Schedule>> findSchedulesByDates(
+            @RequestParam("startDate") @DateTimeFormat(iso=DateTimeFormat.ISO.DATE) LocalDate startDate ,
+            @RequestParam("endDate") @DateTimeFormat(iso=DateTimeFormat.ISO.DATE) LocalDate endDate) {
         return ResponseEntity.ok(scheduleService.findSchedulesByDates(LocalDateTime.of(startDate, LocalTime.of(0, 0)), LocalDateTime.of(endDate, LocalTime.of(23, 59))));
     }
 

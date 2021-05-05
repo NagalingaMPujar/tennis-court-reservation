@@ -13,6 +13,8 @@ import javax.ws.rs.BadRequestException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -38,6 +40,21 @@ public class ReservationService {
 
     public ReservationDTO bookReservation(CreateReservationRequestDTO createReservationRequestDTO) {
 
+        return saveReservationDTO(createReservationRequestDTO);
+
+    }
+
+    public List<ReservationDTO> bookReservation(List<CreateReservationRequestDTO> createReservationRequestDTOs) {
+        List<ReservationDTO> reservationDTOs = new ArrayList<>();
+        for(CreateReservationRequestDTO reservationDTO: createReservationRequestDTOs) {
+            reservationDTOs.add(saveReservationDTO(reservationDTO));
+        }
+
+        return reservationDTOs;
+
+    }
+
+    private ReservationDTO saveReservationDTO(CreateReservationRequestDTO createReservationRequestDTO) {
         ReservationDTO reservationDTO = new ReservationDTO();
         reservationDTO.setRefundValue(BigDecimal.ZERO);
         reservationDTO.setValue(BigDecimal.TEN);
@@ -48,9 +65,7 @@ public class ReservationService {
         Reservation reservation = reservationMapper.map(reservationDTO);
         reservation.setGuest(guestMapper.map(guestService.findById(createReservationRequestDTO.getGuestId())));
         reservationRepository.save(reservation);
-
         return reservationDTO;
-
     }
 
 
@@ -100,6 +115,14 @@ public class ReservationService {
 
         if (hours >= 24) {
             return reservation.getValue();
+        }
+        else if (hours >=12 && hours <24) {
+            return reservation.getValue().divide(BigDecimal.valueOf(3/4L));
+        }
+        else if (hours >=2 && hours <12) {
+            return reservation.getValue().divide(BigDecimal.valueOf(1/2L));
+        } else if (hours < 2) {
+            return reservation.getValue().divide(BigDecimal.valueOf(1/4L));
         }
 
         return BigDecimal.ZERO;

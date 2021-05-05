@@ -44,8 +44,11 @@ public class ScheduleService {
         Optional<TennisCourt> tennisCourtOptional = tennisCourtRepository.findById(tennisCourtId);
         if(tennisCourtOptional.isPresent()) {
             schedule.setTennisCourt(tennisCourtOptional.get());
+            scheduleRepository.save(schedule);
+        } else {
+            throw new EntityNotFoundException("Tennis court not found");
         }
-        scheduleRepository.save(schedule);
+
 
         return scheduleDTO;
     }
@@ -76,6 +79,7 @@ public class ScheduleService {
         ZonedDateTime zonedDateTime = localDate.atStartOfDay(ZoneId.of("Asia/Kolkata"));
 
         LocalDateTime endOfDay = LocalDateTime.of(localDate, LocalTime.MAX);
+       // endOfDay = endOfDay.
         List<Schedule> scheduleList = findSchedulesByDates(startOfDay, endOfDay);
         List<LocalDateTime> startTimeList = new ArrayList<>();
         for(Schedule schedule : scheduleList) {
