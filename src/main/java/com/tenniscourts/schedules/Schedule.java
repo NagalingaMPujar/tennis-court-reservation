@@ -11,19 +11,14 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Component
 @Entity
-@Table
+@Table(name="schedule")
 @Getter
 @Setter
 @Builder
@@ -32,7 +27,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true, exclude = "reservations")
 public class Schedule extends BaseEntity<Long> {
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @NotNull
     private TennisCourt tennisCourt;
 
@@ -44,7 +39,7 @@ public class Schedule extends BaseEntity<Long> {
     @NotNull
     private LocalDateTime endDateTime;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Reservation> reservations;
 
     public void addReservation(Reservation reservation) {

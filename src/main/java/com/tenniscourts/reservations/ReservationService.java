@@ -1,7 +1,12 @@
 package com.tenniscourts.reservations;
 
 import com.tenniscourts.exceptions.EntityNotFoundException;
+import com.tenniscourts.guests.GuestMapper;
+import com.tenniscourts.guests.GuestService;
+import com.tenniscourts.schedules.ScheduleMapper;
+import com.tenniscourts.schedules.ScheduleService;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.BadRequestException;
@@ -13,13 +18,41 @@ import java.time.temporal.ChronoUnit;
 @AllArgsConstructor
 public class ReservationService {
 
+    @Autowired
     private final ReservationRepository reservationRepository;
 
+    @Autowired
     private final ReservationMapper reservationMapper;
 
+    @Autowired
+    private GuestService guestService;
+
+    @Autowired
+    private GuestMapper guestMapper;
+
+    @Autowired
+    private ScheduleService scheduleService;
+
+    @Autowired
+    private ScheduleMapper scheduleMapper;
+
     public ReservationDTO bookReservation(CreateReservationRequestDTO createReservationRequestDTO) {
-        throw new UnsupportedOperationException();
+
+        ReservationDTO reservationDTO = new ReservationDTO();
+        reservationDTO.setRefundValue(BigDecimal.ZERO);
+        reservationDTO.setValue(BigDecimal.TEN);
+        reservationDTO.setSchedule(scheduleService.findSchedule(createReservationRequestDTO.getScheduleId()));
+        reservationDTO.setGuestId(createReservationRequestDTO.getGuestId());
+        reservationDTO.setReservationStatus(ReservationStatus.READY_TO_PLAY.name());
+
+        Reservation reservation = reservationMapper.map(reservationDTO);
+        reservation.setGuest(guestMapper.map(guestService.findById(createReservationRequestDTO.getGuestId())));
+        reservationRepository.save(reservation);
+
+        return reservationDTO;
+
     }
+
 
     public ReservationDTO findReservation(Long reservationId) {
         return reservationRepository.findById(reservationId).map(reservationMapper::map).<BadRequestException>orElseThrow(() -> {
